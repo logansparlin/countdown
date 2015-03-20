@@ -143,7 +143,6 @@ Template.home.rendered = function() {
 			mouseY = event.touches[0].pageY - windowHalfY;
 			targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 			targetRotationY = targetRotationOnMouseDown + (mouseY - mouseYOnMouseDown ) * 0.05;
-
 		}
 
 	}
@@ -155,8 +154,8 @@ Template.home.rendered = function() {
 	}
 
 	function render() {
-		cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
-		cube.rotation.x += ( targetRotationY - cube.rotation.x ) * 0.5;
+		cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.01;
+		cube.rotation.x += ( targetRotationY - cube.rotation.x ) * 0.01;
 		renderer.render( scene, camera );
 		
 	};
