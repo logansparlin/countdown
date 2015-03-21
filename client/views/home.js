@@ -3,6 +3,9 @@ Template.home.rendered = function() {
 		var targetRotation = 0,
 			targetRotationY = 0;
 		var targetRotationOnMouseDown = 0;
+		var particleSystem,
+			particle,
+			particleMaterial;
 
 		var windowHalfX = window.innerWidth / 2;
 		var windowHalfY = window.innerHeight / 2;
@@ -19,13 +22,17 @@ Template.home.rendered = function() {
 			renderer.setClearColor( 0x222222, 1);
 			document.body.appendChild( renderer.domElement );
 
+			 var material = new THREE.MeshLambertMaterial({
+		        map: THREE.ImageUtils.loadTexture('/img/grain.jpg')
+		     });
+
 			var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-			var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+			// var material = new THREE.MeshPhongMaterial( { color: 0x006699 } );
 			cube = new THREE.Mesh( geometry, material );
 			scene.add( cube );
 
 			var bgCube = new THREE.BoxGeometry(200, 1, 200);
-			var bgMesh = new THREE.MeshPhongMaterial( {color: 0x333333 });
+			var bgMesh = new THREE.MeshPhongMaterial( {color: 0x666666 });
 			var bg = new THREE.Mesh( bgCube, bgMesh)
 			bg.rotation.x = Math.PI/180 * 90;
 		    bg.position.set(0,0, -50);
@@ -37,12 +44,12 @@ Template.home.rendered = function() {
 			directionalLight.position.set( 0, 1, 0 );
 			scene.add( directionalLight );
 
-			var light = new THREE.AmbientLight( 0x333333 )
-			light.shadowBias = 0.001;
+			var light = new THREE.AmbientLight( 0x222222 )
+			light.shadowBias = 0.01;
 			scene.add(light)
 
-			var spotLight = new THREE.SpotLight( 0x666666 );
-			spotLight.position.set( 100, 100, 200 );
+			var spotLight = new THREE.SpotLight( 0xffffff );
+			spotLight.position.set( 120, 120, 200 );
 
 			spotLight.castShadow = true;
 
@@ -51,19 +58,37 @@ Template.home.rendered = function() {
 
 			spotLight.shadowCameraNear = 500;
 			spotLight.shadowCameraFar = 4000;
-			spotLight.shadowCameraFov = 30;
+			spotLight.shadowCameraFov = 130;
+			spotLight.exponent = 5;
+			spotLight.intensity = 1;
 
 			scene.add( spotLight );
 
 			// End Lights
 
-			camera.position.z = 5;
+			// // Particles 
+
+			particles = new THREE.Geometry;
+
+			for (var p = 0; p < 50000; p++) {
+				var particle = new THREE.Vector3(Math.random() * 500 - 350, Math.random() * 500 - 350, Math.random() * 500 - 450 );
+				particles.vertices.push(particle)
+			}
+
+			particleMaterial = new THREE.PointCloudMaterial({ color: 0x444444, size: 1});
+
+			particleSystem = new THREE.PointCloud(particles, particleMaterial);
+
+			scene.add(particleSystem);
+
+			// // End Particles
+
+			camera.position.z = 3;
 
 			document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 			document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 			document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-			//
 
 			window.addEventListener( 'resize', onWindowResize, false );
 		}
@@ -154,6 +179,8 @@ Template.home.rendered = function() {
 	}
 
 	function render() {
+		particleSystem.rotation.y += 0.003;
+		particleSystem.rotation.x += 0.004
 		cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.01;
 		cube.rotation.x += ( targetRotationY - cube.rotation.x ) * 0.01;
 		renderer.render( scene, camera );
